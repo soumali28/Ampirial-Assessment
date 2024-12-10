@@ -33,6 +33,7 @@ import {
   User,
   Users,
 } from "lucide-react";
+import { useState } from "react";
 
 const JobDetails = ({
   isDrawerOpen,
@@ -40,6 +41,8 @@ const JobDetails = ({
   selectedApplication,
 }) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const [role, setRole] = useState("candidate");
+
   const getStatusColor = (status) => {
     switch (status) {
       case "Accepted":
@@ -61,24 +64,31 @@ const JobDetails = ({
         <section className="space-y-4 sm:space-y-2">
           <h2 className="text-md sm:text-lg font-semibold flex items-center">
             <User className="mr-2 h-5 w-5 text-blue-500" />
-            Candidate Profile
+            {role === "recruiter" ? "Candidate " : "Company "}
+            Profile
           </h2>
           <Card className="p-3 mt-0">
             <div className="flex items-start space-x-4">
               <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
                 <span className="text-md sm:text-lg  font-semibold text-blue-600">
-                  {selectedApplication.candidate.charAt(0)}
+                  {role === "recruiter"
+                    ? selectedApplication.candidate.charAt(0)
+                    : selectedApplication.companyName.charAt(0)}
                 </span>
               </div>
               <div className="flex-1 space-y-1">
                 <div>
                   <h3 className="font-semibold text-md sm:text-lg ">
-                    {selectedApplication.candidate}
+                    {role === "recruiter"
+                      ? selectedApplication.candidate
+                      : selectedApplication.companyName}
                   </h3>
                 </div>
                 <div className="flex items-center text-sm text-gray-500">
                   <Mail className="h-4 w-4 mr-2" />
-                  {selectedApplication.candidateEmail}
+                  {role === "recruiter"
+                      ? selectedApplication.candidateEmail
+                      : selectedApplication.companyEmail}
                 </div>
               </div>
             </div>

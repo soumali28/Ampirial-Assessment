@@ -1,15 +1,30 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { X, Plus, DollarSign, Mail, User, Briefcase, Check } from 'lucide-react';
+import {
+  X,
+  Plus,
+  DollarSign,
+  Mail,
+  User,
+  Briefcase,
+  Check,
+} from "lucide-react";
 
 const CreateOffer = () => {
   const [formData, setFormData] = useState({
     companyName: "",
+    companyEmail: "",
     jobTitle: "",
     jobDescription: "",
     salary: "",
@@ -21,7 +36,7 @@ const CreateOffer = () => {
     location: "",
     reportingTo: "",
     benefits: [""],
-    additionalNotes: ""
+    additionalNotes: "",
   });
 
   const [showSuccess, setShowSuccess] = useState(false);
@@ -34,7 +49,7 @@ const CreateOffer = () => {
     "Sales",
     "HR",
     "Finance",
-    "Operations"
+    "Operations",
   ];
 
   const handleInputChange = (e) => {
@@ -66,6 +81,7 @@ const CreateOffer = () => {
       setShowSuccess(false);
       setFormData({
         companyName: "",
+        companyEmail: "",
         jobTitle: "",
         jobDescription: "",
         salary: "",
@@ -77,7 +93,7 @@ const CreateOffer = () => {
         location: "",
         reportingTo: "",
         benefits: [""],
-        additionalNotes: ""
+        additionalNotes: "",
       });
     }, 3000);
   };
@@ -96,7 +112,8 @@ const CreateOffer = () => {
             <Alert className="mb-6 bg-green-50 border-green-200">
               <Check className="h-4 w-4 text-green-500" />
               <AlertDescription className="text-green-700">
-                Job offer created successfully! An email will be sent to the candidate.
+                Job offer created successfully! An email will be sent to the
+                candidate.
               </AlertDescription>
             </Alert>
           )}
@@ -104,8 +121,11 @@ const CreateOffer = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
-              <div>
-                  <label htmlFor="jobTitle" className="block text-sm font-medium text-gray-700 mb-1">
+                <div>
+                  <label
+                    htmlFor="jobTitle"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Company Name *
                   </label>
                   <Input
@@ -118,7 +138,26 @@ const CreateOffer = () => {
                   />
                 </div>
                 <div>
-                  <label htmlFor="jobTitle" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="jobTitle"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Company Email *
+                  </label>
+                  <Input
+                    id="companyEmail"
+                    name="companyEmail"
+                    value={formData.companyEmail}
+                    onChange={handleInputChange}
+                    placeholder="e.g. lDd0L@example.com"
+                    required
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="jobTitle"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Job Title *
                   </label>
                   <Input
@@ -132,12 +171,17 @@ const CreateOffer = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="department" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="department"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Department *
                   </label>
                   <Select
                     value={formData.department}
-                    onValueChange={(value) => setFormData({ ...formData, department: value })}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, department: value })
+                    }
                     required
                   >
                     <SelectTrigger>
@@ -154,7 +198,10 @@ const CreateOffer = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="salary" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="salary"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Annual Salary *
                   </label>
                   <div className="relative">
@@ -173,25 +220,14 @@ const CreateOffer = () => {
                     />
                   </div>
                 </div>
-
-                <div>
-                  <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
-                    Start Date *
-                  </label>
-                  <Input
-                    id="startDate"
-                    name="startDate"
-                    type="date"
-                    value={formData.startDate}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="candidateName" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="candidateName"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Candidate Name *
                   </label>
                   <div className="relative">
@@ -211,7 +247,10 @@ const CreateOffer = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="candidateEmail" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="candidateEmail"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Candidate Email *
                   </label>
                   <div className="relative">
@@ -232,12 +271,17 @@ const CreateOffer = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="jobType" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="jobType"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Job Type *
                   </label>
                   <Select
                     value={formData.jobType}
-                    onValueChange={(value) => setFormData({ ...formData, jobType: value })}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, jobType: value })
+                    }
                     required
                   >
                     <SelectTrigger>
@@ -253,7 +297,10 @@ const CreateOffer = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="location"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Location *
                   </label>
                   <Input
@@ -265,11 +312,30 @@ const CreateOffer = () => {
                     required
                   />
                 </div>
+                <div>
+                  <label
+                    htmlFor="startDate"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Start Date *
+                  </label>
+                  <Input
+                    id="startDate"
+                    name="startDate"
+                    type="date"
+                    value={formData.startDate}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
               </div>
             </div>
 
             <div>
-              <label htmlFor="jobDescription" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="jobDescription"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Job Description *
               </label>
               <Textarea
@@ -292,7 +358,9 @@ const CreateOffer = () => {
                   <div key={index} className="flex items-center gap-2">
                     <Input
                       value={benefit}
-                      onChange={(e) => handleBenefitChange(e.target.value, index)}
+                      onChange={(e) =>
+                        handleBenefitChange(e.target.value, index)
+                      }
                       placeholder={`e.g. Health Insurance, 401(k), etc.`}
                       required
                     />
@@ -323,7 +391,10 @@ const CreateOffer = () => {
             </div>
 
             <div>
-              <label htmlFor="additionalNotes" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="additionalNotes"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Additional Notes
               </label>
               <Textarea

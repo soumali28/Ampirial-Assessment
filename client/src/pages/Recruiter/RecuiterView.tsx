@@ -23,6 +23,8 @@ const RecruiterView: React.FC = () => {
   const applications = [
     {
       id: 1,
+      companyName: "TechCo",
+      companyEmail: "5v0Ml@example.com",
       candidate: "John Doe",
       status: "Pending",
       position: "Frontend Developer",
@@ -40,6 +42,8 @@ const RecruiterView: React.FC = () => {
     },
     {
       id: 2,
+      companyName: "Apple Inc.",
+      companyEmail: "5v0Ml@example.com",
       candidate: "Jane Smith",
       status: "Accepted",
       position: "Backend Developer",
