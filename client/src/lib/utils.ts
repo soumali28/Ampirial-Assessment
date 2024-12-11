@@ -182,5 +182,5 @@ export const downloadPDF = (data) => {
   );
 
   // Save the PDF
-  doc.save(`${offer.candidate}_Offer_Letter.pdf`);
+  doc.save(`${offer.candidate.name}_Offer_Letter.pdf`);
 };

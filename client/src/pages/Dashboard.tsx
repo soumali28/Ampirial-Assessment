@@ -12,7 +12,7 @@ const Dashboard = () => {
   const apiUrl =
     role === "candidate"
       ? `http://localhost:5001/api/users/recruiters?email=${email}`
-      : "http://localhost:5001/api/users/candidates";
+      : `http://localhost:5001/api/users/candidates?companyEmail=${email}`;
 
   const getUsers = async () => {
     try {

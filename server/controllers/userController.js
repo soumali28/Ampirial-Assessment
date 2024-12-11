@@ -72,9 +72,15 @@ exports.getRecruiters = async (req, res) => {
 
 exports.getCandidates = async (req, res) => {
   try {
+    const { companyEmail } = req.query;
+
+    if (!companyEmail) {
+      return res.status(400).json({ message: "companyEmail query parameter is required" });
+    }
+
     const candidates = await User.aggregate([
       {
-        $match: { role: "candidate" }, // Filter users with role 'candidate'
+        $match: { role: "candidate" },
       },
       {
         $lookup: {
@@ -82,6 +88,22 @@ exports.getCandidates = async (req, res) => {
           localField: "_id",
           foreignField: "candidate",
           as: "offers",
+        },
+      },
+      {
+        $addFields: {
+          offers: {
+            $filter: {
+              input: "$offers",
+              as: "offer",
+              cond: { $eq: ["$$offer.companyEmail", companyEmail] },
+            },
+          },
+        },
+      },
+      {
+        $match: {
+          "offers.0": { $exists: true },
         },
       },
     ]);
@@ -92,6 +114,8 @@ exports.getCandidates = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
 
 exports.getCandidate = async (req, res) => {
   try {
