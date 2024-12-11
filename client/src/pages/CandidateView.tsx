@@ -18,6 +18,8 @@ import {
   Users,
 } from "lucide-react";
 import JobDetails from "./components/JobDetails";
+import AcceptDialog from "./components/AcceptDialog";
+import { downloadPDF } from "@/lib/utils";
 
 const CandidateView = () => {
   const offers = [
@@ -67,7 +69,9 @@ const CandidateView = () => {
   ];
 
   const [openDrawer, setOpenDrawer] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
+  const [signature, setSignature] = useState("");
 
   const handleOpenDrawer = (application) => {
     setSelectedApplication(application);
@@ -77,6 +81,19 @@ const CandidateView = () => {
     setOpenDrawer(false);
   };
 
+  const openAcceptDialog = (application) => {
+    setSelectedApplication(application);
+    setOpenDialog(!openDialog);
+  };
+
+  const handleAcceptOffer = (signature) => {
+    // Handle the offer acceptance with the signature
+    console.log(`Offer accepted with signature: ${signature}`);
+    // You could call your downloadPDF function here
+    downloadPDF({ ...selectedApplication, signature });
+  };
+
+  
   const getStatusBadge = (status) => {
     switch (status) {
       case "Completed":
@@ -174,7 +191,11 @@ const CandidateView = () => {
                     <Button size="lg" className="w-md" variant="outline">
                       Decline
                     </Button>
-                    <Button size="lg" className="w-2xl">
+                    <Button
+                      size="lg"
+                      className="w-2xl"
+                      onClick={() => openAcceptDialog(offer)}
+                    >
                       Accept
                     </Button>
                   </div>
@@ -198,6 +219,15 @@ const CandidateView = () => {
         isDrawerOpen={openDrawer}
         handleCloseDrawer={handleCloseDrawer}
         selectedApplication={selectedApplication}
+      />
+      <AcceptDialog
+        isDialogOpen={openDialog}
+        handleCloseDialog={openAcceptDialog}
+        selectedApplication={selectedApplication}
+        handleSubmit={handleAcceptOffer}
+        role={"candidate"}
+        signature={signature}
+        setSignature={setSignature}
       />
     </div>
   );

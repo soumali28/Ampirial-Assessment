@@ -34,6 +34,7 @@ import {
   Users,
 } from "lucide-react";
 import { useState } from "react";
+import { downloadPDF } from "@/lib/utils";
 
 const JobDetails = ({
   isDrawerOpen,
@@ -210,7 +211,7 @@ const JobDetails = ({
             <Button variant="outline" onClick={handleCloseDrawer}>
               Close
             </Button>
-            <Button>
+            <Button  onClick={() => downloadPDF(selectedApplication)}>
               <Download className="h-4 w-4 mr-2" />
               Download
             </Button>
@@ -247,7 +248,7 @@ const JobDetails = ({
                 <Button variant="outline" onClick={handleCloseDrawer}>
                   Close
                 </Button>
-                <Button>
+                <Button onClick={() => downloadPDF(selectedApplication)}>
                   <Download className="h-4 w-4 mr-2" />
                   Download
                 </Button>

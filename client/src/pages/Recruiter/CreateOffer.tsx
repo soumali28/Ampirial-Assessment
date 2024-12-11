@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -20,6 +20,8 @@ import {
   Briefcase,
   Check,
 } from "lucide-react";
+import AcceptDialog from "../components/AcceptDialog";
+import { downloadPDF } from "@/lib/utils";
 
 const CreateOffer = () => {
   const [formData, setFormData] = useState({
@@ -37,9 +39,14 @@ const CreateOffer = () => {
     reportingTo: "",
     benefits: [""],
     additionalNotes: "",
+    recuiterSignature: "",
+    candidateSignature: "",
   });
 
   const [showSuccess, setShowSuccess] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedApplication, setSelectedApplication] = useState(null);
+  const [signature, setSignature] = useState("");
 
   const departments = [
     "Engineering",
@@ -73,9 +80,11 @@ const CreateOffer = () => {
     setFormData({ ...formData, benefits: updatedBenefits });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Job Offer Data:", formData);
+    const updatedFormData = { ...formData, recuiterSignature: signature };
+    setFormData({ ...formData, recuiterSignature: signature });
+    downloadPDF(updatedFormData);
     setShowSuccess(true);
     setTimeout(() => {
       setShowSuccess(false);
@@ -94,9 +103,20 @@ const CreateOffer = () => {
         reportingTo: "",
         benefits: [""],
         additionalNotes: "",
+        recuiterSignature: "",
+        candidateSignature: "",
       });
     }, 3000);
   };
+
+  const openAcceptDialog = (formData) => {
+    setSelectedApplication(formData);
+    setOpenDialog(!openDialog);
+  };
+
+  useEffect(() => {
+    console.log("Updated formData:", formData);
+  }, [formData]);
 
   return (
     <div className="mx-auto p-6">
@@ -118,7 +138,7 @@ const CreateOffer = () => {
             </Alert>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
@@ -411,13 +431,25 @@ const CreateOffer = () => {
               {/* <Button type="button" variant="outline">
                 Save as Draft
               </Button> */}
-              <Button type="submit" className="px-8">
+              <Button
+                className="px-8"
+                onClick={() => openAcceptDialog(formData)}
+              >
                 Send Offer
               </Button>
             </div>
           </form>
         </CardContent>
       </Card>
+      <AcceptDialog
+        isDialogOpen={openDialog}
+        handleCloseDialog={openAcceptDialog}
+        selectedApplication={selectedApplication}
+        handleSubmit={handleSubmit}
+        role={"recruiter"}
+        signature={signature}
+        setSignature={setSignature}
+      />
     </div>
   );
 };
