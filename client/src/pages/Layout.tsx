@@ -6,15 +6,33 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import { logout } from "@/apis/logout";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
-  const [role, setRole] = useState("candidate");
+  const role = localStorage.getItem("role");
+  const navigate = useNavigate();
+
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = "";
     };
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      const response = await logout();
+      if (response) {
+        toast.success("Successfully logged out");
+        navigate("/auth/signin");
+      }
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-100 p-4">
@@ -28,7 +46,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
-                <LogOut className="text-red-600" />
+                <Button variant={"ghost"} onClick={handleLogout}>
+                  <LogOut className="text-red-600" />
+                </Button>
               </TooltipTrigger>
               <TooltipContent
                 className="mt-2 text-sm"

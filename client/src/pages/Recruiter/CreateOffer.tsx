@@ -24,6 +24,7 @@ import AcceptDialog from "../components/AcceptDialog";
 import { downloadPDF } from "@/lib/utils";
 
 const CreateOffer = () => {
+  const role = localStorage.getItem("role");
   const [formData, setFormData] = useState({
     companyName: "",
     companyEmail: "",
@@ -446,7 +447,7 @@ const CreateOffer = () => {
         handleCloseDialog={openAcceptDialog}
         selectedApplication={selectedApplication}
         handleSubmit={handleSubmit}
-        role={"recruiter"}
+        role={role}
         signature={signature}
         setSignature={setSignature}
       />

@@ -5,12 +5,11 @@ import RecruiterView from "./Recruiter/RecuiterView";
 import CandidateView from "./CandidateView";
 
 const Dashboard = () => {
-  // Simulate user role (recruiter or candidate)
-  const [role, setRole] = useState("recruiter"); // Change this to "candidate" to see different views.
+  const role = localStorage.getItem("role");
 
   return (
     <Layout>
-      {role === "recruiter" ? <RecruiterView /> : <CandidateView />}
+      {role === "recruiter" ? <RecruiterView  /> : <CandidateView role={role}/>}
     </Layout>
   );
 };

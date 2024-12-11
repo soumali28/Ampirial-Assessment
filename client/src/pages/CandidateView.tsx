@@ -21,7 +21,7 @@ import JobDetails from "./components/JobDetails";
 import AcceptDialog from "./components/AcceptDialog";
 import { downloadPDF } from "@/lib/utils";
 
-const CandidateView = () => {
+const CandidateView = ({ role }) => {
   const offers = [
     {
       id: 1,
@@ -93,7 +93,6 @@ const CandidateView = () => {
     downloadPDF({ ...selectedApplication, signature });
   };
 
-  
   const getStatusBadge = (status) => {
     switch (status) {
       case "Completed":
@@ -225,7 +224,7 @@ const CandidateView = () => {
         handleCloseDialog={openAcceptDialog}
         selectedApplication={selectedApplication}
         handleSubmit={handleAcceptOffer}
-        role={"candidate"}
+        role={role}
         signature={signature}
         setSignature={setSignature}
       />

@@ -11,3 +11,4 @@ router.post("/logout", logoutUser);
 router.get("/validate-token", validateToken);
 
 module.exports = router;
+

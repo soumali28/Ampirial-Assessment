@@ -7,6 +7,9 @@ const cookieParser = require("cookie-parser");
 dotenv.config();
 connectDB();
 
+const authRoutes = require("./routes/authRoutes");
+
+
 const app = express();
 
 app.use(
@@ -15,15 +18,19 @@ app.use(
     credentials: true,
   })
 );
+
 app.use(express.json());
 app.use(cookieParser());
 
+// Routes
+
 app.use("/api/auth", authRoutes);
 
+
 app.use("/", (req, res) => {
-    res.status(200).send("Home Page");
-  });
-  
+  res.status(200).send("Home Page");
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

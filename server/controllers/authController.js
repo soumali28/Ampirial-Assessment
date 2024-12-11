@@ -1,4 +1,3 @@
-// controllers/authController.js
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -21,7 +20,7 @@ exports.registerUser = async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    const user = await User.create({ email, password });
+    const user = await User.create({ name, email, password });
 
     // Generate tokens
     const accessToken = generateAccessToken(user._id);
