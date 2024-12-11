@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import JobDetails from "../components/JobDetails";
 
-const RecruiterView: React.FC = () => {
+const RecruiterView: React.FC = ({data}) => {
   const navigate = useNavigate();
   const [openDrawer, setOpenDrawer] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);

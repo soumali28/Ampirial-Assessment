@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   X,
   Plus,
@@ -22,6 +21,7 @@ import {
 } from "lucide-react";
 import AcceptDialog from "../components/AcceptDialog";
 import { downloadPDF } from "@/lib/utils";
+import toast from "react-hot-toast";
 
 const CreateOffer = () => {
   const role = localStorage.getItem("role");
@@ -37,14 +37,12 @@ const CreateOffer = () => {
     startDate: "",
     department: "",
     location: "",
-    reportingTo: "",
     benefits: [""],
     additionalNotes: "",
     recuiterSignature: "",
     candidateSignature: "",
   });
 
-  const [showSuccess, setShowSuccess] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [signature, setSignature] = useState("");
@@ -84,40 +82,57 @@ const CreateOffer = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const updatedFormData = { ...formData, recuiterSignature: signature };
-    setFormData({ ...formData, recuiterSignature: signature });
-    downloadPDF(updatedFormData);
-    setShowSuccess(true);
-    setTimeout(() => {
-      setShowSuccess(false);
-      setFormData({
-        companyName: "",
-        companyEmail: "",
-        jobTitle: "",
-        jobDescription: "",
-        salary: "",
-        candidateName: "",
-        candidateEmail: "",
-        jobType: "",
-        startDate: "",
-        department: "",
-        location: "",
-        reportingTo: "",
-        benefits: [""],
-        additionalNotes: "",
-        recuiterSignature: "",
-        candidateSignature: "",
+
+    try {
+    const response = await fetch("http://localhost:5001/api/offer/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedFormData),
       });
-    }, 3000);
+
+      if (!response.ok) {
+        throw new Error("Failed to create offer");
+      }
+
+      const data = await response.json();
+
+      console.log("Offer created successfully:", data);
+      setFormData({ ...formData, recuiterSignature: signature });
+      toast.success("Offer created successfully!");
+      // Trigger PDF download
+      //downloadPDF(updatedFormData);
+
+      // Reset form after 3 seconds
+      // setTimeout(() => {
+      //   setFormData({
+      //     companyName: "",
+      //     companyEmail: "",
+      //     jobTitle: "",
+      //     jobDescription: "",
+      //     salary: "",
+      //     candidateName: "",
+      //     candidateEmail: "",
+      //     jobType: "",
+      //     startDate: "",
+      //     department: "",
+      //     location: "",
+      //     benefits: [""],
+      //     additionalNotes: "",
+      //     recuiterSignature: "",
+      //     candidateSignature: "",
+      //   });
+      // }, 3000);
+    } catch (error) {
+      console.error("Error creating offer:", error.message);
+    }
   };
 
   const openAcceptDialog = (formData) => {
     setSelectedApplication(formData);
     setOpenDialog(!openDialog);
   };
-
-  useEffect(() => {
-    console.log("Updated formData:", formData);
-  }, [formData]);
 
   return (
     <div className="mx-auto p-6">
@@ -129,17 +144,7 @@ const CreateOffer = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {showSuccess && (
-            <Alert className="mb-6 bg-green-50 border-green-200">
-              <Check className="h-4 w-4 text-green-500" />
-              <AlertDescription className="text-green-700">
-                Job offer created successfully! An email will be sent to the
-                candidate.
-              </AlertDescription>
-            </Alert>
-          )}
-
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
@@ -372,7 +377,7 @@ const CreateOffer = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Benefits *
+                Benefits 
               </label>
               <div className="space-y-2">
                 {formData.benefits.map((benefit, index) => (
@@ -383,7 +388,6 @@ const CreateOffer = () => {
                         handleBenefitChange(e.target.value, index)
                       }
                       placeholder={`e.g. Health Insurance, 401(k), etc.`}
-                      required
                     />
                     {index > 0 && (
                       <Button
