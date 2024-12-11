@@ -13,29 +13,30 @@ const Dashboard = () => {
     role === "candidate"
       ? `http://localhost:5001/api/users/recruiters?email=${email}`
       : "http://localhost:5001/api/users/candidates";
+
+  const getUsers = async () => {
+    try {
+      const response = await fetch(apiUrl, {
+        method: "GET",
+        credentials: "include",
+      });
+      const data = await response.json();
+      setData(data);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
+
   useEffect(() => {
-    const getUsers = async () => {
-      try {
-        const response = await fetch(apiUrl, {
-          method: "GET",
-          credentials: "include",
-        });
-        const data = await response.json();
-        setData(data);
-        console.log("Data", data);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
-    };
     getUsers();
-  }, []);
+  }, [role]);
 
   return (
     <Layout>
       {role === "recruiter" ? (
         <RecruiterView candidates={data} />
       ) : (
-        <CandidateView role={role} data={data}/>
+        <CandidateView role={role} data={data} getUsers={getUsers} />
       )}
     </Layout>
   );

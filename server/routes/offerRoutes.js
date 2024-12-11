@@ -1,8 +1,9 @@
 // routes/authRoutes.js
 const express = require("express");
-const { createOffer } = require("../controllers/offerController");
+const { createOffer, updateOfferStatus } = require("../controllers/offerController");
 const router = express.Router();
 
 router.post("/create", createOffer);
+router.patch("/update/status/:id", updateOfferStatus);
 
 module.exports = router;

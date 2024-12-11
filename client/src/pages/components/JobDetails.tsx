@@ -45,7 +45,13 @@ const JobDetails = ({
   const role = localStorage.getItem("role");
 
   if (!selectedApplication) return null;
-  const { name, email, offer } = selectedApplication;
+
+  let offer, name, email;
+  if (role === "candidate") {
+    offer = selectedApplication;
+  } else {
+    ({ name, email, offer } = selectedApplication || {});
+  }
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -78,7 +84,7 @@ const JobDetails = ({
                 <span className="text-md sm:text-lg  font-semibold text-blue-600">
                   {role === "recruiter"
                     ? name.charAt(0)
-                    : offer.email.charAt(0)}
+                    : selectedApplication.companyName.charAt(0)}
                 </span>
               </div>
               <div className="flex-1 space-y-1">
@@ -196,7 +202,6 @@ const JobDetails = ({
     </>
   );
 
-  console.log("Selected application", selectedApplication);
   return isMobile ? (
     <Dialog open={isDrawerOpen} onOpenChange={handleCloseDrawer}>
       <DialogContent className="max-w-sm w-full sm:max-w-lg max-h-[90vh] overflow-y-auto">

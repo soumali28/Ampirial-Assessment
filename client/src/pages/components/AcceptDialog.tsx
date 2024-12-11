@@ -27,14 +27,18 @@ const AcceptDialog = ({
     month: "long",
     day: "numeric",
   });
-
   const handleAccept = (e) => {
     e.preventDefault();
     if (!signature) {
       toast.error("Please provide a signature before proceeding.");
       return;
     }
-    handleSubmit(e);
+    if (role === "candidate") {
+      handleSubmit(selectedApplication._id, "accepted", signature);
+    } else {
+      handleSubmit(e);
+    }
+
     handleCloseDialog();
   };
 

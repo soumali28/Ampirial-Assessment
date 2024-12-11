@@ -30,7 +30,6 @@ const Signup = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
     try {
       const response = await fetch("http://localhost:5001/api/auth/signup", {
         method: "POST",

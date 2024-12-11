@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,14 +20,14 @@ import {
 import JobDetails from "./components/JobDetails";
 import AcceptDialog from "./components/AcceptDialog";
 import { downloadPDF, formatDate } from "@/lib/utils";
+import toast from "react-hot-toast";
 
-const CandidateView = ({ role, data }) => {
+const CandidateView = ({ role, data, getUsers }) => {
   if (!data) {
     return <div>Loading...</div>;
   }
   const { email, offers } = data;
 
-  console.log("Offers", offers);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
@@ -43,24 +43,47 @@ const CandidateView = ({ role, data }) => {
 
   const openAcceptDialog = (application) => {
     setSelectedApplication(application);
-    setOpenDialog(!openDialog);
+    setOpenDialog(true);
+  };
+  const closeAcceptDialog = () => {
+    setOpenDialog(false);
   };
 
-  const handleAcceptOffer = (signature) => {
-    // Handle the offer acceptance with the signature
-    console.log(`Offer accepted with signature: ${signature}`);
-    // You could call your downloadPDF function here
-    downloadPDF({ ...selectedApplication, signature });
+  const updateOfferStatus = async (offerId:any, status:any, signature:any) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5001/api/offer/update/status/${offerId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status , signature}),
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        toast.success("Status updated successfully!");
+        getUsers();
+      } else {
+        const errorData = await response.json();
+        console.error("Error updating status:", errorData);
+        toast.error(errorData.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const getStatusBadge = (status) => {
     switch (status) {
-      case "Completed":
+      case "accepted":
         return "bg-green-100 text-green-800 border-green-200 hover:bg-green-100";
-      case "Pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-100";
-      default:
+      case "rejected":
         return "bg-red-100 text-red-800 border-red-200 hover:bg-red-100";
+
+      default:
+        return "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-100";
     }
   };
 
@@ -149,7 +172,12 @@ const CandidateView = ({ role, data }) => {
               <CardFooter className="flex justify-between border-t pt-6">
                 {offer.status === "pending" && (
                   <div className="flex justify-between items-center gap-12 w-full">
-                    <Button size="lg" className="w-md" variant="outline">
+                    <Button
+                      size="lg"
+                      className="w-md"
+                      variant="outline"
+                      onClick={() => updateOfferStatus(offer._id, "rejected", signature)}
+                    >
                       Decline
                     </Button>
                     <Button
@@ -183,9 +211,9 @@ const CandidateView = ({ role, data }) => {
       />
       <AcceptDialog
         isDialogOpen={openDialog}
-        handleCloseDialog={openAcceptDialog}
+        handleCloseDialog={closeAcceptDialog}
         selectedApplication={selectedApplication}
-        handleSubmit={handleAcceptOffer}
+        handleSubmit={updateOfferStatus}
         role={role}
         signature={signature}
         setSignature={setSignature}

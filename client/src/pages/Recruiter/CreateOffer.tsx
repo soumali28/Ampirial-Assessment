@@ -83,7 +83,6 @@ const CreateOffer = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submission")
     const updatedFormData = { ...formData, recruiterSignature: signature };
 
     try {
@@ -102,8 +101,6 @@ const CreateOffer = () => {
       }
 
       const data = await response.json();
-
-      console.log("Offer created successfully:", data);
       setFormData({ ...formData, recruiterSignature: signature });
       toast.success("Offer created successfully!");
       navigate("/");

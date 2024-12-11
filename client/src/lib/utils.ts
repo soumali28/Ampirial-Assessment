@@ -18,8 +18,15 @@ function capitalizeFirstLetter(string) {
 }
 
 export const downloadPDF = (data) => {
-  const { name, email, offer } = data;
   const role = localStorage.getItem("role");
+
+  if (!data) return null;
+  let name, email, offer;
+  if (role === "candidate") {
+    offer = data;
+  } else {
+    ({ name, email, offer } = data || {});
+  }
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.width;
   const pageHeight = doc.internal.pageSize.height;
@@ -66,7 +73,7 @@ export const downloadPDF = (data) => {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(12);
   doc.text(
-    `Dear ${role === "recruiter" ? name : offer.candidate},`,
+    `Dear ${role === "recruiter" ? name : offer.candidate.name},`,
     margin,
     yPosition
   );
