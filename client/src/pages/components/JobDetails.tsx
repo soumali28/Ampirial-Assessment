@@ -44,6 +44,7 @@ const JobDetails = ({
   const isMobile = useMediaQuery("(max-width: 768px)");
   const role = localStorage.getItem("role");
 
+  if (!selectedApplication) return null;
   const { name, email, offer } = selectedApplication;
 
   const getStatusBadge = (status) => {

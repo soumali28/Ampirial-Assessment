@@ -19,55 +19,15 @@ import {
 } from "lucide-react";
 import JobDetails from "./components/JobDetails";
 import AcceptDialog from "./components/AcceptDialog";
-import { downloadPDF } from "@/lib/utils";
+import { downloadPDF, formatDate } from "@/lib/utils";
 
-const CandidateView = ({ role }) => {
-  const offers = [
-    {
-      id: 1,
-      companyName: "Acme Corp",
-      companyEmail: "5v0Ml@example.com",
-      candidate: "John Doe",
-      status: "Pending",
-      position: "Frontend Developer",
-      date: "24-12-2022",
-      jobTitle: "Frontend Developer",
-      jobDescription:
-        "Develop user-facing features and ensure application responsiveness.",
-      salary: "$80,000/year",
-      candidateEmail: "johndoe@example.com",
-      jobType: "Full-Time",
-      startDate: "01-01-2023",
-      department: "Engineering",
-      location: "New York, NY",
-      benefits: ["Health Insurance", "401(k) Matching", "Paid Time Off"],
-      additionalNotes:
-        "Candidate has strong experience with React.js and Redux.",
-    },
-    // Example of a completed offer
-    {
-      id: 2,
-      companyName: "TechCo",
-      companyEmail: "5v0Ml@example.com",
-      candidate: "John Doe",
-      status: "Completed",
-      position: "Frontend Developer",
-      date: "20-12-2022",
-      jobTitle: "Senior Frontend Developer",
-      jobDescription:
-        "Lead frontend development initiatives and mentor junior developers.",
-      salary: "$95,000/year",
-      candidateEmail: "johndoe@example.com",
-      jobType: "Full-Time",
-      startDate: "01-02-2023",
-      department: "Engineering",
-      location: "San Francisco, CA",
-      benefits: ["Health Insurance", "401(k) Matching", "Unlimited PTO"],
-      additionalNotes:
-        "Excellent cultural fit with strong leadership potential.",
-    },
-  ];
+const CandidateView = ({ role, data }) => {
+  if (!data) {
+    return <div>Loading...</div>;
+  }
+  const { email, offers } = data;
 
+  console.log("Offers", offers);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
@@ -115,7 +75,7 @@ const CandidateView = ({ role }) => {
                 <div>
                   <h3 className="text-xl font-semibold">{offer.jobTitle}</h3>
                   <p className="text-sm text-gray-500">
-                    Applied on {offer.date}
+                    Click on accept to accept your offer.
                   </p>
                 </div>
                 <Badge className={getStatusBadge(offer.status)}>
@@ -127,7 +87,7 @@ const CandidateView = ({ role }) => {
                   <div className="space-y-3">
                     <div className="flex items-center text-gray-600">
                       <Building className="h-4 w-4 mr-2" />
-                      <span className="text-sm">
+                      <span className="text-sm capitalize">
                         Department: {offer.department}
                       </span>
                     </div>
@@ -145,12 +105,14 @@ const CandidateView = ({ role }) => {
                   <div className="space-y-3">
                     <div className="flex items-center text-gray-600">
                       <Clock className="h-4 w-4 mr-2" />
-                      <span className="text-sm">Type: {offer.jobType}</span>
+                      <span className="text-sm capitalize">
+                        Type: {offer.jobType}
+                      </span>
                     </div>
                     <div className="flex items-center text-gray-600">
                       <Calendar className="h-4 w-4 mr-2" />
                       <span className="text-sm">
-                        Start Date: {offer.startDate}
+                        Start Date: {formatDate(offer.startDate)}
                       </span>
                     </div>
                     <div className="flex items-center text-gray-600">
@@ -185,7 +147,7 @@ const CandidateView = ({ role }) => {
                 </div>
               </CardContent>
               <CardFooter className="flex justify-between border-t pt-6">
-                {offer.status === "Pending" && (
+                {offer.status === "pending" && (
                   <div className="flex justify-between items-center gap-12 w-full">
                     <Button size="lg" className="w-md" variant="outline">
                       Decline
@@ -199,7 +161,7 @@ const CandidateView = ({ role }) => {
                     </Button>
                   </div>
                 )}
-                {offer.status === "Completed" && (
+                {offer.status === "accepted" && (
                   <Button
                     variant="outline"
                     size="lg"

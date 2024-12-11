@@ -6,11 +6,12 @@ import CandidateView from "./CandidateView";
 
 const Dashboard = () => {
   const role = localStorage.getItem("role");
+  const email = localStorage.getItem("email");
   const [data, setData] = useState(null);
 
   const apiUrl =
     role === "candidate"
-      ? "http://localhost:5001/api/users/recruiters"
+      ? `http://localhost:5001/api/users/recruiters?email=${email}`
       : "http://localhost:5001/api/users/candidates";
   useEffect(() => {
     const getUsers = async () => {
@@ -34,7 +35,7 @@ const Dashboard = () => {
       {role === "recruiter" ? (
         <RecruiterView candidates={data} />
       ) : (
-        <CandidateView role={role} />
+        <CandidateView role={role} data={data}/>
       )}
     </Layout>
   );

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
+const Offer = require("../models/Offer");
 
 // exports.getUsers = async (req, res) => {
 //   try {
@@ -25,12 +26,47 @@ const User = require("../models/User");
 // };
 
 exports.getRecruiters = async (req, res) => {
+  const { email } = req.query;
   try {
-    const recruiters = await User.find({ role: "recruiter" });
-    res.status(200).json(recruiters);
+    if (!email) {
+      return res
+        .status(400)
+        .json({ message: "Candidate email query parameter is required." });
+    }
+
+    // Find offers based on candidate email
+    const offers = await Offer.find()
+      .populate({
+        path: "candidate",
+        match: { email }, // Filter by candidate's email
+        select: "name email", // Include candidate details
+      })
+      .exec();
+
+    const filteredOffers = offers.filter((offer) => offer.candidate !== null);
+
+    if (filteredOffers.length === 0) {
+      return res.status(200).json({
+        message: "No offers found for the provided candidate email.",
+        offers: [],
+      });
+    }
+    const recruiterEmails = filteredOffers.map((offer) => offer.companyEmail);
+    const recruiters = await User.find({
+      email: { $in: recruiterEmails },
+      role: "recruiter",
+    });
+
+    const response = {
+      email,
+      recruiters,
+      offers: filteredOffers,
+    };
+
+    res.status(200).json(response);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
+    console.error("Error fetching offers and recruiters:", error);
+    res.status(500).json({ message: "Server error." });
   }
 };
 
