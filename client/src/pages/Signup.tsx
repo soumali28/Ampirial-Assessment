@@ -4,12 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
+    role: "candidate",
   });
 
   const navigate = useNavigate();
@@ -18,9 +20,17 @@ const Signup = () => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("click", e.target.checked);
+    setFormData((prev) => ({
+      ...prev,
+      role: e.target.checked ? "recruiter" : "candidate",
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log(formData);
     try {
       const response = await fetch("http://localhost:5001/api/auth/signup", {
         method: "POST",
@@ -43,10 +53,9 @@ const Signup = () => {
       }
 
       toast.success("Sign up successful!");
-      setFormData({ name: "", email: "", password: "" });
+      setFormData({ name: "", email: "", password: "", role: "candidate" });
       navigate("/");
     } catch (err: any) {
-      //toast.error("Sign up failed!");
       console.error("Error:", err.message);
     }
   };
@@ -85,6 +94,15 @@ const Signup = () => {
               value={formData.password}
               onChange={handleChange}
             />
+          </div>
+          <div className="flex items-center space-x-2">
+            <input type="checkbox" onChange={handleCheckboxChange} />
+            <label
+              htmlFor="role"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Recruiter
+            </label>
           </div>
           <Button className="w-full mt-4" type="submit">
             Sign Up
