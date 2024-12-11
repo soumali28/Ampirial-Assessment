@@ -34,7 +34,7 @@ import {
   Users,
 } from "lucide-react";
 import { useState } from "react";
-import { downloadPDF } from "@/lib/utils";
+import { downloadPDF, formatDate } from "@/lib/utils";
 
 const JobDetails = ({
   isDrawerOpen,
@@ -42,16 +42,19 @@ const JobDetails = ({
   selectedApplication,
 }) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const [role, setRole] = useState("candidate");
+  const role = localStorage.getItem("role");
 
-  const getStatusColor = (status) => {
+  const { name, email, offer } = selectedApplication;
+
+  const getStatusBadge = (status) => {
     switch (status) {
-      case "Accepted":
+      case "accepted":
         return "bg-green-100 text-green-800 border-green-200 hover:bg-green-100";
-      case "Pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-100";
+      case "rejected":
+        return "bg-red-100 text-red-800 border-red-200 hover:bg-red-100";
+
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-100";
+        return "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-100";
     }
   };
 
@@ -73,23 +76,23 @@ const JobDetails = ({
               <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
                 <span className="text-md sm:text-lg  font-semibold text-blue-600">
                   {role === "recruiter"
-                    ? selectedApplication.candidate.charAt(0)
-                    : selectedApplication.companyName.charAt(0)}
+                    ? name.charAt(0)
+                    : offer.email.charAt(0)}
                 </span>
               </div>
               <div className="flex-1 space-y-1">
                 <div>
                   <h3 className="font-semibold text-md sm:text-lg ">
                     {role === "recruiter"
-                      ? selectedApplication.candidate
+                      ? name
                       : selectedApplication.companyName}
                   </h3>
                 </div>
                 <div className="flex items-center text-sm text-gray-500">
                   <Mail className="h-4 w-4 mr-2" />
                   {role === "recruiter"
-                      ? selectedApplication.candidateEmail
-                      : selectedApplication.companyEmail}
+                    ? email
+                    : selectedApplication.companyEmail}
                 </div>
               </div>
             </div>
@@ -108,45 +111,43 @@ const JobDetails = ({
                 <DollarSign className="h-4 w-4 mr-2" />
                 Salary
               </div>
-              <p className="font-semibold">{selectedApplication.salary}</p>
+              <p className="font-semibold">{offer.salary}</p>
             </Card>
             <Card className="p-4">
               <div className="flex items-center text-gray-500 mb-1">
                 <Clock className="h-4 w-4 mr-2" />
                 Job Type
               </div>
-              <p className="font-semibold">{selectedApplication.jobType}</p>
+              <p className="font-semibold capitalize">{offer.jobType}</p>
             </Card>
             <Card className="p-4">
               <div className="flex items-center text-gray-500 mb-1">
                 <MapPin className="h-4 w-4 mr-2" />
                 Location
               </div>
-              <p className="font-semibold">{selectedApplication.location}</p>
+              <p className="font-semibold capitalize">{offer.location}</p>
             </Card>
             <Card className="p-4">
               <div className="flex items-center text-gray-500 mb-1">
                 <Users className="h-4 w-4 mr-2" />
                 Department
               </div>
-              <p className="font-semibold">{selectedApplication.department}</p>
+              <p className="font-semibold capitalize">{offer.department}</p>
             </Card>
           </div>
 
-          <Card className="p-4 space-y-3">
+          <Card className="p-4 space-y-4">
             <div className="flex items-center text-gray-500">
               <Calendar className="h-4 w-4 mr-2" />
               Start Date:{" "}
               <span className="font-semibold ml-1">
-                {selectedApplication.startDate}
+                {formatDate(offer.startDate)}
               </span>
             </div>
             <div className="flex items-center text-gray-500">
               <Briefcase className="h-4 w-4 mr-2" />
-              Position: {selectedApplication.position}
-              <span className="font-semibold ml-1">
-                {selectedApplication.reportingTo}
-              </span>
+              Position: {offer.jobTitle}
+              <span className="font-semibold ml-1">{offer.reportingTo}</span>
             </div>
           </Card>
         </section>
@@ -156,7 +157,7 @@ const JobDetails = ({
           <h2 className="text-md sm:text-lg  font-semibold">Job Description</h2>
           <Card className="p-4">
             <p className="text-gray-600 leading-relaxed">
-              {selectedApplication.jobDescription}
+              {offer.jobDescription}
             </p>
           </Card>
         </section>
@@ -169,7 +170,7 @@ const JobDetails = ({
           </h2>
           <Card className="p-4">
             <ul className="space-y-2">
-              {selectedApplication.benefits.map((benefit, index) => (
+              {offer.benefits?.map((benefit, index) => (
                 <li key={index} className="flex items-center">
                   <div className="h-2 w-2 bg-blue-500 rounded-full mr-3" />
                   {benefit}
@@ -180,15 +181,13 @@ const JobDetails = ({
         </section>
 
         {/* Additional Notes */}
-        {selectedApplication.additionalNotes && (
+        {offer.additionalNotes && (
           <section className="space-y-4 sm:space-y-2">
             <h2 className="text-md sm:text-lg  font-semibold">
               Additional Notes
             </h2>
             <Card className="p-4">
-              <p className="text-gray-600 italic">
-                {selectedApplication.additionalNotes}
-              </p>
+              <p className="text-gray-600 italic">{offer.additionalNotes}</p>
             </Card>
           </section>
         )}
@@ -196,6 +195,7 @@ const JobDetails = ({
     </>
   );
 
+  console.log("Selected application", selectedApplication);
   return isMobile ? (
     <Dialog open={isDrawerOpen} onOpenChange={handleCloseDrawer}>
       <DialogContent className="max-w-sm w-full sm:max-w-lg max-h-[90vh] overflow-y-auto">
@@ -211,7 +211,7 @@ const JobDetails = ({
             <Button variant="outline" onClick={handleCloseDrawer}>
               Close
             </Button>
-            <Button  onClick={() => downloadPDF(selectedApplication)}>
+            <Button onClick={() => downloadPDF(offer)}>
               <Download className="h-4 w-4 mr-2" />
               Download
             </Button>
@@ -232,10 +232,10 @@ const JobDetails = ({
 
               <div className="flex items-center justify-between">
                 <SheetDescription className="text-sm text-gray-500">
-                  Application submitted on {selectedApplication.date}
+                  Review the application details below.
                 </SheetDescription>
-                <Badge className={getStatusColor(selectedApplication.status)}>
-                  {selectedApplication.status}
+                <Badge className={getStatusBadge(offer.status)}>
+                  {offer.status}
                 </Badge>
               </div>
             </SheetHeader>

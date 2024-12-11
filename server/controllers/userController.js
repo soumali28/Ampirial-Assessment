@@ -36,8 +36,38 @@ exports.getRecruiters = async (req, res) => {
 
 exports.getCandidates = async (req, res) => {
   try {
-    const candidates = await User.find({ role: "candidate" });
+    const candidates = await User.aggregate([
+      {
+        $match: { role: "candidate" }, // Filter users with role 'candidate'
+      },
+      {
+        $lookup: {
+          from: "offers",
+          localField: "_id",
+          foreignField: "candidate",
+          as: "offers",
+        },
+      },
+    ]);
+
     res.status(200).json(candidates);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.getCandidate = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const candidate = await User.findById(id);
+
+    if (!candidate || candidate.role !== "candidate") {
+      return res.status(400).json({ message: "Candidate not found" });
+    }
+
+    res.status(200).json(candidate);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });

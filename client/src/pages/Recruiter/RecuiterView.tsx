@@ -2,65 +2,71 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import JobDetails from "../components/JobDetails";
+import toast from "react-hot-toast";
 
-const RecruiterView: React.FC = ({data}) => {
+interface Candidate {
+  _id: string;
+  name: string;
+  offers: [];
+}
+
+interface RecruiterViewProps {
+  candidates: Candidate[];
+}
+
+const RecruiterView: React.FC<RecruiterViewProps> = ({ candidates }) => {
   const navigate = useNavigate();
   const [openDrawer, setOpenDrawer] = useState(false);
-  const [selectedApplication, setSelectedApplication] = useState(null);
+  const [selectedApplication, setSelectedApplication] = useState({
+    name: "",
+    email: "",
+    offer: {},
+  });
 
   const handleCreateOffer = () => {
     navigate("/create-offer");
   };
 
-  const handleOpenDrawer = (application) => {
-    setSelectedApplication(application);
+  const getDetails = async (id, offer) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5001/api/users/candidates/${id}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+      if (!response.ok) {
+        toast.error("Something went wrong");
+        throw new Error("Failed to create offer");
+      }
+
+      const data = await response.json();
+      const name = data.name;
+      const email = data.email;
+      setSelectedApplication({ name, email, offer });
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+
+    //setSelectedApplication(id);
     setOpenDrawer(true);
   };
   const handleCloseDrawer = () => {
     setOpenDrawer(false);
   };
 
-  const applications = [
-    {
-      id: 1,
-      companyName: "TechCo",
-      companyEmail: "5v0Ml@example.com",
-      candidate: "John Doe",
-      status: "Pending",
-      position: "Frontend Developer",
-      date: "24-12-2022",
-      jobTitle: "Frontend Developer",
-      jobDescription: "Develop user-facing features and ensure application responsiveness.",
-      salary: "$80,000/year",
-      candidateEmail: "johndoe@example.com",
-      jobType: "Full-Time",
-      startDate: "01-01-2023",
-      department: "Engineering",
-      location: "New York, NY",
-      benefits: ["Health Insurance", "401(k) Matching", "Paid Time Off"],
-      additionalNotes: "Candidate has strong experience with React.js and Redux.",
-    },
-    {
-      id: 2,
-      companyName: "Apple Inc.",
-      companyEmail: "5v0Ml@example.com",
-      candidate: "Jane Smith",
-      status: "Accepted",
-      position: "Backend Developer",
-      date: "24-12-2022",
-      jobTitle: "Backend Developer",
-      jobDescription: "Build and maintain server-side logic and databases.",
-      salary: "$90,000/year",
-      candidateEmail: "janesmith@example.com",
-      jobType: "Contract",
-      startDate: "15-01-2023",
-      department: "Backend Team",
-      location: "San Francisco, CA",
-      benefits: ["Remote Work Option", "Professional Development Stipend"],
-      additionalNotes: "Impressive knowledge of Node.js and MongoDB.",
-    },
-  ];
-  
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case "accepted":
+        return "bg-green-100 text-green-800 border-green-200 hover:bg-green-100";
+      case "rejected":
+        return "bg-red-100 text-red-800 border-red-200 hover:bg-red-100";
+
+      default:
+        return "bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-100";
+    }
+  };
 
   return (
     <div className="bg-white rounded-md shadow-md mt-4 h-[calc(100vh-115px)]">
@@ -72,60 +78,78 @@ const RecruiterView: React.FC = ({data}) => {
         <table className="w-full">
           <thead>
             <tr className="bg-gray-50">
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Candidate</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Position</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Status</th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Date</th>
-              <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600">Actions</th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                Candidate
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                Position
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                Status
+              </th>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                Date
+              </th>
+              <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {applications.map((application) => (
-              <tr 
-                key={application.id}
-                className="hover:bg-gray-50 transition-colors"
-              >
-                <td className="px-6 py-4">
-                  <div className="flex items-center">
-                    <div className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-100 flex items-center justify-center">
-                      <span className="text-sm font-medium text-gray-600">
-                        {application.candidate.split(' ').map(n => n[0]).join('')}
-                      </span>
-                    </div>
-                    <div className="ml-4">
-                      <div className="font-medium text-gray-900">{application.candidate}</div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-600">{application.position}</td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                      application.status === "Accepted"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}
+            {candidates &&
+              candidates.map((candidate) =>
+                candidate.offers.map((offer) => (
+                  <tr
+                    key={offer._id}
+                    className="hover:bg-gray-50 transition-colors"
                   >
-                    {application.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-600">
-                  {new Date(application.date).toLocaleDateString()}
-                </td>
-                <td className="px-6 py-4 text-right">
-                  <div className="flex items-center justify-end gap-2">
-                    <Button 
-                      variant="outline"
-                      size="sm"
-                      className="text-sm"
-                      onClick={() => handleOpenDrawer(application)}
-                    >
-                      View Details
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center">
+                        <div className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-100 flex items-center justify-center">
+                          <span className="text-sm font-medium text-gray-600">
+                            {candidate.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </span>
+                        </div>
+                        <div className="ml-4">
+                          <div className="font-medium text-gray-900">
+                            {candidate.name}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      {offer.jobTitle}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusBadge(
+                          offer.status
+                        )}`}
+                      >
+                        {offer.status || "pending"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      {new Date(offer.startDate).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-sm"
+                          onClick={() => getDetails(offer.candidate, offer)}
+                        >
+                          View Details
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
           </tbody>
         </table>
       </div>

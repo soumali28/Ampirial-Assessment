@@ -25,6 +25,11 @@ const OfferSchema = new mongoose.Schema(
     additionalNotes: { type: String },
     recruiterSignature: { type: String },
     candidateSignature: { type: String },
+    status: {
+      type: String,
+      enum: ["pending", "accepted", "rejected"],
+      default: "pending",
+    },
   },
   { timestamps: true }
 );

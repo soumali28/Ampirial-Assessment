@@ -48,6 +48,7 @@ exports.createOffer = async (req, res) => {
       additionalNotes,
       recruiterSignature,
       candidateSignature,
+      status: "pending",
     });
 
     await newOffer.save();

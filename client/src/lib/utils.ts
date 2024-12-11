@@ -7,7 +7,19 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const downloadPDF = (offer) => {
+export const formatDate = (date) => {
+  const options = { year: "numeric", month: "long", day: "numeric" };
+  return new Date(date).toLocaleDateString("en-US", options);
+};
+
+function capitalizeFirstLetter(string) {
+  if (!string) return ""; // Handle null or undefined values
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+}
+
+export const downloadPDF = (data) => {
+  const { name, email, offer } = data;
+  const role = localStorage.getItem("role");
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.width;
   const pageHeight = doc.internal.pageSize.height;
@@ -53,7 +65,11 @@ export const downloadPDF = (offer) => {
   yPosition += 20;
   doc.setFont("helvetica", "normal");
   doc.setFontSize(12);
-  doc.text(`Dear ${offer.candidate},`, margin, yPosition);
+  doc.text(
+    `Dear ${role === "recruiter" ? name : offer.candidate},`,
+    margin,
+    yPosition
+  );
 
   // Add opening paragraph
   yPosition += 15;
@@ -73,15 +89,15 @@ export const downloadPDF = (offer) => {
     margin: { left: margin },
     columnStyles: {
       0: { fontStyle: "bold", cellWidth: 80 },
-      1: { cellWidth: pageWidth - 2 * margin - 20 },
+      1: { cellWidth: pageWidth - 2 * margin - 10 },
     },
     body: [
-      ["Position", offer.position],
-      ["Department", offer.department],
-      ["Location", offer.location],
-      ["Start Date", offer.startDate],
-      ["Job Type", offer.jobType],
-      ["Salary", offer.salary],
+      ["Position", capitalizeFirstLetter(offer.jobTitle)],
+      ["Department", capitalizeFirstLetter(offer.department)],
+      ["Location", capitalizeFirstLetter(offer.location)],
+      ["Start Date", formatDate(offer.startDate)],
+      ["Job Type", capitalizeFirstLetter(offer.jobType)],
+      ["Salary", "$" + capitalizeFirstLetter(offer.salary)],
     ],
     theme: "plain",
     styles: {
@@ -111,7 +127,7 @@ export const downloadPDF = (offer) => {
   yPosition += 10;
   doc.setFont("helvetica", "normal");
 
-  offer.benefits.forEach((benefit) => {
+  offer.benefits?.forEach((benefit) => {
     doc.text("• " + benefit, margin + 5, yPosition);
     yPosition += 7;
   });
@@ -129,17 +145,17 @@ export const downloadPDF = (offer) => {
   yPosition += 20;
 
   // Add recruiter signature if available
-  if (offer.recuiterSignature != "") {
+  if (offer.recruiterSignature) {
     doc.setFont("helvetica", "italic");
     doc.setFontSize(10);
-    doc.text(offer.recuiterSignature, margin, yPosition - 5);
+    doc.text(offer.recruiterSignature, margin, yPosition - 5);
   }
   doc.line(margin, yPosition, margin + 70, yPosition);
   doc.setFont("helvetica", "normal");
   doc.text("Company Representative", margin, yPosition + 10);
 
   // Add candidate signature if available
-  if (offer.candidateSignature != "") {
+  if (offer.candidateSignature) {
     doc.setFont("helvetica", "italic");
     doc.setFontSize(10);
     doc.text(offer.candidateSignature, pageWidth - margin - 70, yPosition - 5);

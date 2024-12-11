@@ -22,6 +22,7 @@ import {
 import AcceptDialog from "../components/AcceptDialog";
 import { downloadPDF } from "@/lib/utils";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const CreateOffer = () => {
   const role = localStorage.getItem("role");
@@ -39,13 +40,14 @@ const CreateOffer = () => {
     location: "",
     benefits: [""],
     additionalNotes: "",
-    recuiterSignature: "",
+    recruiterSignature: "",
     candidateSignature: "",
   });
 
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [signature, setSignature] = useState("");
+  const navigate = useNavigate();
 
   const departments = [
     "Engineering",
@@ -81,49 +83,33 @@ const CreateOffer = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const updatedFormData = { ...formData, recuiterSignature: signature };
+    console.log("Submission")
+    const updatedFormData = { ...formData, recruiterSignature: signature };
 
     try {
-    const response = await fetch("http://localhost:5001/api/offer/create", {
+      const response = await fetch("http://localhost:5001/api/offer/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+
         body: JSON.stringify(updatedFormData),
       });
 
       if (!response.ok) {
+        toast.error("Something went wrong");
         throw new Error("Failed to create offer");
       }
 
       const data = await response.json();
 
       console.log("Offer created successfully:", data);
-      setFormData({ ...formData, recuiterSignature: signature });
+      setFormData({ ...formData, recruiterSignature: signature });
       toast.success("Offer created successfully!");
+      navigate("/");
+      setSignature("");
       // Trigger PDF download
       //downloadPDF(updatedFormData);
-
-      // Reset form after 3 seconds
-      // setTimeout(() => {
-      //   setFormData({
-      //     companyName: "",
-      //     companyEmail: "",
-      //     jobTitle: "",
-      //     jobDescription: "",
-      //     salary: "",
-      //     candidateName: "",
-      //     candidateEmail: "",
-      //     jobType: "",
-      //     startDate: "",
-      //     department: "",
-      //     location: "",
-      //     benefits: [""],
-      //     additionalNotes: "",
-      //     recuiterSignature: "",
-      //     candidateSignature: "",
-      //   });
-      // }, 3000);
     } catch (error) {
       console.error("Error creating offer:", error.message);
     }
@@ -377,7 +363,7 @@ const CreateOffer = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Benefits 
+                Benefits
               </label>
               <div className="space-y-2">
                 {formData.benefits.map((benefit, index) => (
@@ -438,7 +424,10 @@ const CreateOffer = () => {
               </Button> */}
               <Button
                 className="px-8"
-                onClick={() => openAcceptDialog(formData)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  openAcceptDialog(formData);
+                }}
               >
                 Send Offer
               </Button>

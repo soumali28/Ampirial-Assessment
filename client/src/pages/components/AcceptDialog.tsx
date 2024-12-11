@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { CalendarCheck, FileSignature } from "lucide-react";
+import toast from "react-hot-toast";
 
 const AcceptDialog = ({
   isDialogOpen,
@@ -27,20 +28,32 @@ const AcceptDialog = ({
     day: "numeric",
   });
 
+  const handleAccept = (e) => {
+    e.preventDefault();
+    if (!signature) {
+      toast.error("Please provide a signature before proceeding.");
+      return;
+    }
+    handleSubmit(e);
+    handleCloseDialog();
+  };
+
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Sign Offer Letter</DialogTitle>
           <DialogDescription>
-            {role === "candidate" ? "You are about to sign the offer letter for" : "Please sign the offer letter for"}
+            {role === "candidate"
+              ? "You are about to sign the offer letter for"
+              : "Please sign the offer letter for"}
             <span className="font-medium text-md ml-1 text-primary">
               {selectedApplication?.jobTitle}
             </span>
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-2 pt-1">
+        <form className="space-y-2 pt-1">
           <div className="space-y-2">
             <Label htmlFor="signature" className="flex items-center gap-2">
               <FileSignature className="h-4 w-4" />
@@ -71,7 +84,10 @@ const AcceptDialog = ({
             <Button type="button" variant="ghost" onClick={handleCloseDialog}>
               Cancel
             </Button>
-            <Button type="submit" disabled={!signature.trim()}>
+            <Button
+              onClick={(e) => handleAccept(e)}
+              disabled={!signature.trim()}
+            >
               Accept & Sign
             </Button>
           </DialogFooter>

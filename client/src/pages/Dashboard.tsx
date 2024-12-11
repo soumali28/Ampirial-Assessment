@@ -20,7 +20,8 @@ const Dashboard = () => {
           credentials: "include",
         });
         const data = await response.json();
-        console.log(data);
+        setData(data);
+        console.log("Data", data);
       } catch (error) {
         console.error("Error fetching users:", error);
       }
@@ -30,7 +31,11 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      {role === "recruiter" ? <RecruiterView data={data}/> : <CandidateView role={role} />}
+      {role === "recruiter" ? (
+        <RecruiterView candidates={data} />
+      ) : (
+        <CandidateView role={role} />
+      )}
     </Layout>
   );
 };
